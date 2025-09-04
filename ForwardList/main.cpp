@@ -8,36 +8,46 @@ class Element
 {
 	int Data;		//Значение элемента
 	Element* pNext;	//Значение следующего элемента
-	static int count;
+	//static int count;
 public:
 	Element(int Data, Element* pNext = nullptr)
 	{
 		this->Data = Data;
 		this->pNext = pNext;
-		count++;
+		//count++;
 		cout << "EConstructor:\t" << this << endl;
 	}
 	~Element()
 	{
-		count--;
+		//count--;
 		cout << "EDestructor:\t" << this << endl;
 	}
 	friend class ForwardList;	//приватные поля этого класса доступны другу "ForwardList"
 };
-int Element::count = 0;
+//int Element::count = 0;
 class ForwardList
 {
 	Element* Head;
+	int size;
 public:
 	ForwardList()
 	{
 		//Конструктор по умолчанию - создаёт пустой список
 		Head = nullptr;	//Если список пуст, то его голова указывает на 0
+		size = 0;
 		cout << "FLConstructor:\t" << this << endl;
 	}
 	~ForwardList()
 	{
 		cout << "FLDestructor:\t" << this << endl;
+		while (Head)pop_front();
+		size = 0;
+		/*while (Head)
+		{
+			Element* Temp = Head;
+			Head = Head->pNext;
+			delete Temp;
+		}*/
 	}
 
 	//			Adding element:
@@ -51,6 +61,7 @@ public:
 
 		//3) Переносим голову на новый элемент (Отправляем новый элемент в голову):
 		Head = New;
+		size++;
 	}
 	void push_back(int Data)
 	{
@@ -59,6 +70,7 @@ public:
 		Element* Temp = Head;
 		while (Temp->pNext)Temp = Temp->pNext;
 		Temp->pNext = New;
+		size++;
 		/*if (Head == nullptr)
 		{
 			Head = new Element(Data);
@@ -72,7 +84,7 @@ public:
 	void insert(int Data, int Index)
 	{
 		if (Index == 0)return push_front(Data);
-		if (Index >= Element::count)return push_back(Data);
+		if (Index >= size)return push_back(Data);
 		//1) Доходим до нужного элемента (элемент перед добавляемым)
 		Element* Temp = Head;
 		for (int i = 0; i < Index - 1; i++)Temp = Temp->pNext;
@@ -85,17 +97,20 @@ public:
 
 		//4) Пристыковываем предыдущий элемент к новому:
 		Temp->pNext = New;
+		size++;
 	}
 
 	//					Removing elements
 	void pop_front()
 	{
+		if (Head == nullptr)return;
 		//1) Запоминаем адрес удаляемого элемента:
 		Element* Erased = Head;
 		//2) Исключаем удаляемый элемент из списка:
 		Head = Head->pNext;
 		//3) Удаляем удаляемый элемент из памяти:
 		delete Erased;
+		size--;
 		/*if (Head == nullptr) return;
 		Element* Temp = Head;
 		Head = Head->pNext;
@@ -103,16 +118,41 @@ public:
 	}
 	void pop_back()
 	{
+		if (Head == nullptr)return;
+		if (Head->pNext == nullptr)
+		{
+			delete Head;
+			Head = nullptr;
+			size--;
+			return;
+		}
 		Element* Temp = Head;
 		while (Temp->pNext->pNext != nullptr)Temp = Temp->pNext;
 		delete Temp->pNext;
 		Temp->pNext = nullptr;
+		size--;
 		/*Element* Temp = Head;
 		if (Head == nullptr) return;
 		while (Temp->pNext != nullptr)
 			Temp = Temp->pNext;
 		delete Temp->pNext;
 		Temp->pNext = nullptr;*/
+	}
+	void erase(int Index)
+	{
+		if (Head == nullptr)return;
+		if (Index == 0)return pop_front();
+		if (Index >= size || Index < 0)return;
+
+		Element* Temp = Head;
+		for (int i = 0; Temp->pNext && i < (Index - 1); i++)
+			Temp = Temp->pNext;
+		if (Temp->pNext == nullptr)return;
+
+		Element* Erased = Temp->pNext;
+		Temp->pNext = Erased->pNext;
+		delete Erased;
+		size--;
 	}
 
 	//				Methods
@@ -126,7 +166,26 @@ public:
 			cout << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
 			Temp = Temp->pNext;
 		}
-		cout << "Количество элементов: " << Element::count << endl;
+		cout << "Количество элементов: " << size << endl;
+	}
+
+	ForwardList operator+(const ForwardList& other) const
+	{
+		ForwardList result;
+		Element* Temp = Head;
+
+		while (Temp)
+		{
+			result.push_back(Temp->Data);
+			Temp = Temp->pNext;
+		}
+		Temp = other.Head;
+		while (Temp)
+		{
+			result.push_back(Temp->Data);
+			Temp = Temp->pNext;
+		}
+		return result;
 	}
 };
 
@@ -173,10 +232,15 @@ void main()
 	list2.push_back(89);
 	list2.print();
 
-	int index;
-	int value;
-	cout << "Введите индекс добавляемого элемента: "; cin >> index;
-	cout << "Введите значение добавляемого элемента: "; cin >> value;
-	list1.insert(value, index);
-	list1.print();
+	//int index;
+	//int value;
+	//cout << "Введите индекс добавляемого элемента: "; cin >> index;
+	//cout << "Введите значение добавляемого элемента: "; cin >> value;
+	//list1.insert(value, index);
+	//list1.print();
+
+	ForwardList fusion = list1 + list2;
+	fusion.print();
+	//ForwardList(list1 + list2).print();
+	//(list1+list2).print();
 }
