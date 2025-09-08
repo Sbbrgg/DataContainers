@@ -97,11 +97,27 @@ public:
 	//			Operators:
 	ForwardList& operator=(const ForwardList& other)
 	{
-		if (this == &other)return *this;	//0) Проверяем, не является ли 'this' и 'other' одним объектом.
-		while (Head)pop_front();			//1) Старое значение объекта удаляется из памяти
-		//2)Deep copy (Побитовое копирование)
+		//if (this == &other)return *this;	//0) Проверяем, не является ли 'this' и 'other' одним объектом.
+		//while (Head)pop_front();			//1) Старое значение объекта удаляется из памяти
+		////2)Deep copy (Побитовое копирование)
+		//for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
+		//	push_back(Temp->Data);
+		//cout << "FLCopyAssignment:\t" << this << endl;
+		//return *this;
+		if (this == &other)return *this;
+		while (Head)pop_front();
+		Element* last_element = nullptr;
 		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
-			push_back(Temp->Data);
+		{
+			Element* NewData = new Element(Temp->Data);
+			if (!Head) Head = last_element = NewData;
+			else
+			{
+				last_element->pNext = NewData;
+				last_element = NewData;
+			}
+			size++;
+		}
 		cout << "FLCopyAssignment:\t" << this << endl;
 		return *this;
 	}
@@ -120,7 +136,13 @@ public:
 	}
 	int& operator[](size_t index)
 	{
-		if (index >= size)throw std::out_of_range("Index out of range!");
+		Element* Temp = Head;
+		for (size_t i = 0; i < index; i++)
+			Temp = Temp->pNext;
+		return Temp->Data;
+	}
+	const int& operator[](size_t index)const
+	{
 		Element* Temp = Head;
 		for (size_t i = 0; i < index; i++)
 			Temp = Temp->pNext;
