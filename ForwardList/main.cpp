@@ -54,11 +54,30 @@ public:
 		size = 0;
 		cout << "FLConstructor:\t" << this << endl;
 	}
-	ForwardList(const ForwardList& other):ForwardList()
+	ForwardList(size_t size) :ForwardList()
+	{
+		clock_t t_start = clock();
+		for (int i = 0; i < size; i++)
+		{
+			push_front(rand() % 10);
+		}
+		clock_t t_end = clock();
+		cout << "FLConstructor(n):\t" << this << "\tcomplete for " << double(t_end - t_start) / CLOCKS_PER_SEC << endl;
+	}
+	ForwardList(const ForwardList& other) :ForwardList()
 	{
 		//Deep copy (Побитовое копирование)
 		*this = other;
 		cout << "FLCopyConstructor:\t" << this << endl;
+	}
+	ForwardList(ForwardList&& other)
+	{
+		//Shallow Copy
+		this->Head = other.Head;
+		this->size = other.size;
+		other.Head = nullptr;
+		other.size = 0;
+		cout << "FLMoveConstructor:\t" << this << endl;
 	}
 	~ForwardList()
 	{
@@ -85,6 +104,27 @@ public:
 			push_back(Temp->Data);
 		cout << "FLCopyAssignment:\t" << this << endl;
 		return *this;
+	}
+	ForwardList& operator=(ForwardList&& other)
+	{
+		if (this == &other)return *this;
+		while (Head)pop_front();
+
+		this->Head = other.Head;
+		this->size = other.size;
+
+		other.Head = nullptr;
+		other.size = 0;
+		cout << "FLMoveAssignment:\t" << this << endl;
+		return *this;
+	}
+	int& operator[](size_t index)
+	{
+		if (index >= size)throw std::out_of_range("Index out of range!");
+		Element* Temp = Head;
+		for (size_t i = 0; i < index; i++)
+			Temp = Temp->pNext;
+		return Temp->Data;
 	}
 
 	//			Adding element:
@@ -220,13 +260,15 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right)
 		fusion.push_back(Temp->Data);
 	for (Element* Temp = right.Head; Temp; Temp = Temp->pNext)
 		fusion.push_back(Temp->Data);
-	
+
 	return fusion;
 }
 
 //#define BASE_CHECK
-#define OPERATOR_PLUS_CHECK
+//#define OPERATOR_PLUS_CHECK
 //#define PERFORMANCE_CHECK
+//#define HOMEWORK_FIRST_CHECK
+#define HOMEWORK_SECOND_CHECK
 
 void main()
 {
@@ -301,5 +343,28 @@ void main()
 	system("pause");
 #endif // PERFORMANCE_CHECK
 
+#ifdef HOMEWORK_FIRST_CHECK
+	ForwardList list(100000);
+	clock_t t_start = clock();
+	for (size_t i = 0; i < list.get_size(); i++)
+		list[i] = rand() % 100;
+	clock_t t_end = clock();
+	cout << "Operator [] perfomance: " << double(t_end - t_start) / CLOCKS_PER_SEC << " sec\n" << endl;
+#endif // HOMEWORK_FIRST_CHECK
+
+#ifdef HOMEWORK_SECOND_CHECK
+	ForwardList list1(100000);
+	clock_t t_start = clock();
+	ForwardList list2 = list1;
+	clock_t t_end = clock();
+	cout << "Copy constructor time: " << double(t_end - t_start) / CLOCKS_PER_SEC << " sec" << endl;
+
+	ForwardList list3;
+	t_start = clock();
+	list3 = list1; // copy assignment
+	t_end = clock();
+	cout << "Copy assignment time: " << double(t_end - t_start) / CLOCKS_PER_SEC << " sec" << endl;
+
+#endif // HOMEWORK_SECOND_CHECK
 
 }
