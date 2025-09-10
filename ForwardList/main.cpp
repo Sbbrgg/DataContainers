@@ -33,9 +33,46 @@ public:
 
 	}
 	friend class ForwardList;	//приватные поля этого класса доступны другу "ForwardList"
+	friend class Iterator;
 	friend ForwardList operator+(const ForwardList& left, const ForwardList& right);
 };
 int Element::count = 0;
+
+class Iterator
+{
+	Element* Temp;
+public:
+	Iterator(Element* Temp = nullptr) : Temp(Temp)
+	{
+		cout << "ItConstructor:\t" << this << endl;
+	}
+	~Iterator()
+	{
+		cout << "ItDesturctor:\t" << this << endl;
+	}
+	Iterator& operator++()
+	{
+		Temp = Temp->pNext;
+		return *this;
+	}
+	bool operator==(const Iterator& other) const
+	{
+		return this->Temp == other.Temp;
+	}
+	bool operator!=(const Iterator& other) const
+	{
+		return this->Temp != other.Temp;
+	}
+	int operator*() const
+	{
+		return Temp->Data;
+	}
+	int& operator*() 
+	{
+		return Temp->Data;
+	}
+};
+
 class ForwardList
 {
 	Element* Head;
@@ -49,6 +86,14 @@ public:
 	{
 		return size;
 	}
+	Iterator begin()
+	{
+		return Head;
+	}
+	Iterator end()
+	{
+		return nullptr;
+	}
 	ForwardList()
 	{
 		//Конструктор по умолчанию - создаёт пустой список
@@ -60,6 +105,14 @@ public:
 	{
 		while (size--)push_front(0);
 		cout << "FLSizeConstructor:\t" << this << endl;
+	}
+	ForwardList(const std::initializer_list<int>& il) :ForwardList()
+	{
+		for (int const* it = il.begin(); it != il.end(); it++)
+		{
+			push_back(*it);
+		}
+		cout << "FLitConstructor:\t" << this << endl;
 	}
 	ForwardList(const ForwardList& other) :ForwardList()
 	{
@@ -263,7 +316,7 @@ public:
 		size = reverse.size;*/
 
 		*this = std::move(reverse);	//встроенная функция, которая явно вызывает MoveAssignment
-									//если он есть, иначе behavior is undefined.
+		//если он есть, иначе behavior is undefined.
 		reverse.Head = nullptr;
 	}
 	void print()const
@@ -293,8 +346,19 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right)
 		fusion.push_front(Temp->Data);
 
 	fusion.reverse();
-	
+
 	return fusion;
+}
+
+void Print(int arr[])
+{
+	cout << typeid(arr).name() << endl;
+	cout << sizeof(arr) / sizeof(arr[0]) << endl;
+	/*for (int i : arr)
+	{
+		cout << i << tab;
+	}
+	cout << endl;*/
 }
 
 //#define BASE_CHECK
@@ -302,7 +366,8 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right)
 //#define PERFORMANCE_CHECK
 //#define SUBSCRIPT_OPERATOR_CHECK
 //#define COPY_SEMANTIC_PERFORMANCE_CHECK
-#define MOVE_SEMANTIC_CHECK
+//#define MOVE_SEMANTIC_CHECK
+//#define RANGE_BASED_ARRAY
 
 void main()
 {
@@ -356,7 +421,7 @@ void main()
 
 	ForwardList list3;
 	cout << delimiter << endl;
-	list3 = list1 + list2;		
+	list3 = list1 + list2;
 	cout << delimiter << endl;
 	for (int i = 0; i < list3.get_size(); i++)cout << list3[i] << tab;
 	//list3.print();
@@ -438,4 +503,28 @@ void main()
 	cout << "Lists concatenated for " << double(t_end - t_start) / CLOCKS_PER_SEC << " seconds" << endl;
 #endif // MOVE_SEMANTIC_CHECK
 
+#ifdef RANGE_BASED_ARRAY
+	int arr[] = { 3, 5, 8, 13, 21 };
+	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
+	{
+		cout << arr[i] << tab;
+	}
+	cout << endl;
+
+	//Range-based "for" - for для диапазона. Под диапазоном понимается контейнер 
+	//(какой-то набор элементов)
+
+	for (int i : arr)
+	{
+		cout << i << tab;
+	}
+	cout << endl;
+	cout << typeid(arr).name() << endl;
+	Print(arr);
+#endif // RANGE_BASED_ARRAY
+
+	ForwardList list = { 3,5,8,13,21 };
+	//Перечисление значений в фигурных скобках через запятую неявно создаёт объект класса "Initializer list"
+	list.print();
+	for (int i : list)cout << i << tab;cout << endl;
 }
