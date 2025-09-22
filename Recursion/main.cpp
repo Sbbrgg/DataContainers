@@ -22,7 +22,7 @@ void main()
 
 	int a, b;
 	cout << "\t\t\t\tФакториал: \n"; cin >> a;
-	cout << "Factorial(" << a << ") = " << Factorial(5) << endl;
+	cout << "Factorial(" << a << ") = " << Factorial(a) << endl;
 	cout << "\n\n\t\t\t\tВозведение в степень " << endl;
 	cout << "Введите основание: "; cin >> a;
 	cout << "Введите степень: "; cin >> b;
