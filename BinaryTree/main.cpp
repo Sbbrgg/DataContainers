@@ -8,7 +8,7 @@ using std::endl;
 
 class Tree
 {
-	protected:
+protected:
 	class Element
 	{
 		int Data;
@@ -37,6 +37,10 @@ public:
 	{
 		insert(Data, Root);
 	}
+	int depth() const
+	{
+		return depth(Root);
+	}
 	void erase(int Data)
 	{
 		return erase(Data, Root);
@@ -62,6 +66,10 @@ public:
 		print(Root);
 		cout << endl;
 	}
+	/*void tree_print()const
+	{
+		tree_print(Root);
+	}*/
 	double AVG()
 	{
 		return AVG(Root);
@@ -85,9 +93,19 @@ public:
 		clear();
 		cout << "TDestructor:\t" << this << endl;
 	}
-	void clear() 
+	void clear()
 	{
 		clear(Root);
+	}
+	void Balance()
+	{
+		int n = count(Root);
+		int* arr = new int[n];
+		int index = 0;
+		value_from_tree(Root, arr, index);
+		clear(Root);
+		Root = BuildBalancedTree(arr, 0, n - 1);
+		delete[] arr;
 	}
 private:
 	virtual void insert(int Data, Element* Root)
@@ -104,6 +122,13 @@ private:
 			if (Root->pRight == nullptr)Root->pRight = new Element(Data);
 			else insert(Data, Root->pRight);
 		}
+	}
+	int depth(Element* Root)const
+	{
+		if (!Root)return 0;
+		int left = depth(Root->pLeft);
+		int right = depth(Root->pRight);
+		return left >= right ? left + 1 : right + 1;
 	}
 	void erase(int Data, Element*& Root)
 	{
@@ -143,7 +168,7 @@ private:
 		int c = count(getRoot());
 		return c == 0 ? 0 : (double)Summ(Root) / c;
 	}
-	int minValue(Element* Root)const 
+	int minValue(Element* Root)const
 	{
 		return Root == nullptr ? INT_MIN : Root->pLeft == nullptr ? Root->Data : minValue(Root->pLeft);
 		/*if (Root->pLeft == nullptr)return Root->Data;
@@ -174,6 +199,27 @@ private:
 		print(Root->pLeft);
 		cout << Root->Data << tab;
 		print(Root->pRight);
+	}
+	/*void tree_print(Element* Root)const
+	{
+		if (!Root)return;
+
+	}*/
+	void value_from_tree(Element* Root, int* arr, int& index)const
+	{
+		if (!Root)return;
+		value_from_tree(Root->pLeft, arr, index);
+		arr[index++] = Root->Data;
+		value_from_tree(Root->pRight, arr, index);
+	}
+	Element* BuildBalancedTree(int* arr, int start, int end)
+	{
+		if (start > end)return nullptr;
+		int mid = (start - end) / 2;
+		Element* node = new Element(arr[mid]);
+		node->pLeft = BuildBalancedTree(arr, start, mid - 1);
+		node->pRight = BuildBalancedTree(arr, mid + 1, end);
+		return node;
 	}
 	friend class UniqueTree;
 };
@@ -248,13 +294,13 @@ void main()
 	cout << "Среднее арифметическое элементов дерева: " << u_tree.AVG() << endl;
 #endif // BASE_CHECK
 
-	Tree tree = 
-	{ 
-					50, 
+	Tree tree =
+	{
+					50,
 
-			25,				75, 
+			25,				75,
 
-		16,		32,		58,		85 
+		16,		32,		58,		85
 	};
 	tree.print();
 	int value;
