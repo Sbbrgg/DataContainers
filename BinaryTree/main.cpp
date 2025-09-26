@@ -5,6 +5,9 @@ using std::cout;
 using std::endl;
 
 #define tab "\t"
+
+//#define MAX(a,b) a>b?a:b
+
 //#define DEBUG
 
 class Tree
@@ -127,11 +130,16 @@ private:
 	}
 	int depth(Element* Root)const
 	{
-		return
+		return Root == nullptr ? 0 : std::max(depth(Root->pLeft) + 1, depth(Root->pRight) + 1);
+		/*if (Root == nullptr)return 0;
+		int l_depth = depth(Root->pLeft) + 1;
+		int r_depth = depth(Root->pRight) + 1;
+		return l_depth < r_depth ? r_depth : l_depth;*/
+		/*return
 			Root == nullptr ? 0 :
 			depth(Root->pLeft) + 1 > depth(Root->pRight) + 1 ?
 			depth(Root->pLeft) + 1 :
-			depth(Root->pRight) + 1;
+			depth(Root->pRight) + 1;*/
 		/*if (!Root)return 0;
 		int left = depth(Root->pLeft);
 		int right = depth(Root->pRight);
@@ -297,6 +305,7 @@ template<typename T>void measure_performance(const char massage[], T(Tree::*func
 
 //#define BASE_CHECK
 //#define ERASE_CHECK
+#define PERFORMANCE_CHECK
 
 void main()
 {
@@ -345,16 +354,17 @@ void main()
 		16,		32,		58,		85,91,98
 	};
 	tree.print();
-	int value;
-	cout << "Введите удаляемое значение: "; cin >> value;
-	tree.erase(25);
-	tree.erase(32);
+	//int value;
+	//cout << "Введите удаляемое значение: "; cin >> value;
+	//tree.erase(25);
+	//tree.erase(32);
 	tree.erase(50);
-	tree.erase(75);
+	//tree.erase(75);
 	tree.print();
 	cout << "Глубина дерева: " << tree.depth() << endl;
 #endif // ERASE_CHECK
 
+#ifdef PERFORMANCE_CHECK
 	int n;
 	cout << "Введите количество элементов: "; cin >> n;
 	Tree tree;
@@ -374,4 +384,7 @@ void main()
 	measure_performance("Сумма элементов дерева: ", &Tree::sum, tree);
 	measure_performance("Количество элементов дерева: ", &Tree::count, tree);
 	//measure_performance("Среднее арифметическое жерева: ", &Tree::AVG, tree);
+	measure_performance("Глубина дерева: ", &Tree::depth, tree);
+#endif // 
+
 }
