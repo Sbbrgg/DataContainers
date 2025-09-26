@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 using std::cin;
 using std::cout;
 using std::endl;
@@ -254,7 +255,30 @@ public:
 		return insert(Data, Root);
 	}
 };
+void performance_test(Tree& tree)
+{
+	clock_t start, end;
 
+	start = clock();
+	cout << "Сумма элементов: " << tree.sum() << endl;
+	end = clock();
+	cout << "Время sum(): " << double(end - start) / CLOCKS_PER_SEC * 1000 << " мс" << endl;
+
+	start = clock();
+	cout << "Среднее: " << tree.AVG() << endl;
+	end = clock();
+	cout << "Время AVG(): " << double(end - start) / CLOCKS_PER_SEC * 1000 << " мс" << endl;
+
+	start = clock();
+	cout << "Min: " << tree.minValue() << " Max: " << tree.maxValue() << endl;
+	end = clock();
+	cout << "Время min/max(): " << double(end - start) / CLOCKS_PER_SEC * 1000 << " мс" << endl;
+
+	start = clock();
+	cout << "Depth: " << tree.depth() << endl;
+	end = clock();
+	cout << "Время depth(): " << double(end - start) / CLOCKS_PER_SEC * 1000 << " мс" << endl;
+}
 //#define BASE_CHECK
 
 void main()
