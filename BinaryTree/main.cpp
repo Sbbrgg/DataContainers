@@ -106,17 +106,44 @@ public:
 		clear();
 		cout << "TDestructor:\t" << this << endl;
 	}
-	void Balance()
+	void balance()
+	{
+		balance(Root);
+	}
+	/*void Balance()
 	{
 		int n = count(Root);
 		int* arr = new int[n];
 		int index = 0;
 		value_from_tree(Root, arr, index);
 		clear(Root);
+		Root = nullptr;
 		Root = BuildBalancedTree(arr, 0, n - 1);
 		delete[] arr;
-	}
+	}*/
 private:
+	void balance(Element* Root)
+	{
+		if (Root == nullptr)return;
+		if(abs(count(Root->pLeft) - count(Root->pRight)) < 2)return;
+		if (count(Root->pLeft) < count(Root->pRight))
+		{
+			if (Root->pLeft)insert(Root->Data, Root->pLeft);
+			else Root->pLeft = new Element(Root->Data);
+			Root->Data = minValue(Root->pRight);
+			erase(minValue(Root->pRight), Root->pRight);
+		}
+		if (count(Root->pLeft) > count(Root->pRight))
+		{
+			if (Root->pRight)insert(Root->Data, Root->pRight);
+			else Root->pRight = new Element(Root->Data);
+			Root->Data = maxValue(Root->pLeft);
+			erase(maxValue(Root->pLeft), Root->pLeft);
+		}
+		balance(Root->pLeft);
+		balance(Root->pRight);
+		balance(Root);
+	}
 	virtual void insert(int Data, Element* Root)
 	{
 		if (this->Root == nullptr)this->Root = new Element(Data);
@@ -151,7 +178,12 @@ private:
 	}
 	void depth_print(int depth, Element* Root, int width)const
 	{
-		if (Root == nullptr)return;
+		if (Root == nullptr)
+		{
+			/*cout.width(width);
+			cout << "";*/
+			return;
+		}
 		if (depth == 0)
 		{
 			cout.width(width);
@@ -162,7 +194,12 @@ private:
 	}
 	void tree_print(int depth, int width)const
 	{
-		if (depth == -1)return;
+		if (depth == -1)
+		{
+			cout.width(width);
+			cout << " ";
+			return;
+		}
 		tree_print(depth - 1, width * 1.5);
 		depth_print(depth - 1, width);
 		cout << endl;
@@ -239,12 +276,7 @@ private:
 		cout << Root->Data << tab;
 		print(Root->pRight);
 	}
-	/*void tree_print(Element* Root)const
-	{
-		if (!Root)return;
-
-	}*/
-	void value_from_tree(Element* Root, int* arr, int& index)const
+	/*void value_from_tree(Element* Root, int* arr, int& index)const
 	{
 		if (!Root)return;
 		value_from_tree(Root->pLeft, arr, index);
@@ -254,12 +286,12 @@ private:
 	Element* BuildBalancedTree(int* arr, int start, int end)
 	{
 		if (start > end)return nullptr;
-		int mid = (start - end) / 2;
+		int mid = (start + end) / 2;
 		Element* node = new Element(arr[mid]);
 		node->pLeft = BuildBalancedTree(arr, start, mid - 1);
 		node->pRight = BuildBalancedTree(arr, mid + 1, end);
 		return node;
-	}
+	}*/
 	friend class UniqueTree;
 };
 
@@ -400,12 +432,15 @@ void main()
 	};
 	tree.print();
 	cout << "Глубина дерева: " << tree.depth() << endl;
-
-	tree.tree_print();
+	/*tree.Balance();
+	tree.tree_print();*/
 	cout << endl;
 
+	Tree tree2 = { 55,34,21,13,8,5,3 };
+	tree2.balance();
+	tree2.tree_print();
+	
 #endif // DEPTH_CHECK
-
 
 #ifdef PERFORMANCE_CHECK
 	int n;
@@ -428,6 +463,6 @@ void main()
 	measure_performance("Количество элементов дерева: ", &Tree::count, tree);
 	//measure_performance("Среднее арифметическое жерева: ", &Tree::AVG, tree);
 	measure_performance("Глубина дерева: ", &Tree::depth, tree);
-#endif // 
+#endif //PERFORMANCE_CHECK
 
 }
