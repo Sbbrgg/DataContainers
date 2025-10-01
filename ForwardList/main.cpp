@@ -109,6 +109,7 @@ public:
 	}
 	ForwardList(int size) :ForwardList()
 	{
+		if (size < 0)throw std::invalid_argument("Лист не может быть размером отрицательного числа");
 		while (size--)push_front(0);
 		cout << "FLSizeConstructor:\t" << this << endl;
 	}
@@ -190,12 +191,14 @@ public:
 
 	int operator[](int size)const
 	{
+		if (size < 0 || size >= this->size)throw std::out_of_range("Неверно введён индекс");
 		Element* Temp = Head;
 		for (int i = 0; i < size; i++)Temp = Temp->pNext;
 		return Temp->Data;
 	}
 	int& operator[](int size)
 	{
+		if (size < 0 || size >= this->size)throw std::out_of_range("Неверно введён индекс");
 		Element* Temp = Head;
 		for (int i = 0; i < size; i++)Temp = Temp->pNext;
 		return Temp->Data;
@@ -234,8 +237,10 @@ public:
 	}
 	void insert(int Data, int Index)
 	{
+		if (Index < 0)throw std::invalid_argument("Отрицательный индекс");
 		if (Index == 0)return push_front(Data);
-		if (Index >= size)return push_back(Data);
+		if (Index >= size)throw std::out_of_range("Выход за пределы");
+			/*return push_back(Data);*/
 		//1) Доходим до нужного элемента (элемент перед добавляемым)
 		Element* Temp = Head;
 		for (int i = 0; i < Index - 1; i++)Temp = Temp->pNext;
@@ -293,9 +298,9 @@ public:
 	}
 	void erase(int Index)
 	{
-		if (Head == nullptr)return;
+		if (Head == nullptr)throw std::runtime_error("Удаление из пустого списка");
 		if (Index == 0)return pop_front();
-		if (Index >= size || Index < 0)return;
+		if (Index >= size || Index < 0)throw std::out_of_range("Выход за пределы листа");
 
 		Element* Temp = Head;
 		for (int i = 0; Temp->pNext && i < (Index - 1); i++)
